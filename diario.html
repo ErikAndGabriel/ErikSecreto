@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📖 Meu Diário Pessoal - Erik</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
+    <style>
+        /* Estilos específicos para a página do diário */
+        .diario-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar - Perfil */
+        .sidebar {
+            background: rgba(17, 17, 24, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+        
+        .profile-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .profile-image-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+        }
+        
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent-red);
+            box-shadow: 0 0 30px var(--accent-red);
+        }
+        
+        .profile-glow {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: radial-gradient(circle, var(--accent-red) 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: pulse 2s infinite;
+        }
+        
+        .profile-name {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .profile-title {
+            color: var(--accent-red);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+        
+        .profile-info {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .info-item i {
+            color: var(--accent-blue);
+            width: 20px;
+        }
+        
+        .info-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            min-width: 80px;
+        }
+        
+        .info-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            flex: 1;
+            text-align: right;
+        }
+        
+        .sidebar-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+        
+        .stat-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: 5px;
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .logout-btn {
+            width: 100%;
+            background: linear-gradient(45deg, var(--accent-red), var(--accent-purple));
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            color: var(--text-primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 0, 85, 0.3);
+        }
+        
+        /* Conteúdo Principal */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        /* Cabeçalho do Diário */
+        .diario-header {
+            background: rgba(17, 17, 24, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .diario-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-red), var(--accent-blue), var(--accent-green));
+        }
+        
+        .header-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .header-title h1 {
+            font-size: 2rem;
+            background: linear-gradient(45deg, var(--accent-red), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .date-display {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        /* Nova Entrada */
+        .nova-entrada {
+            background: rgba(17, 17, 24, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-red);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: var(--accent-red);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+        
+        .form-control {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+            outline: none;
+        }
+        
+        .form-control:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(0, 168, 255, 0.3);
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-cyan));
+            color: var(--text-primary);
+            flex: 1;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Lista de Entradas */
+        .entradas-container {
+            background: rgba(17, 17, 24, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .entrada-filtros {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .filtro-btn {
+            padding: 8px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .filtro-btn.active {
+            background: var(--accent-blue);
+            color: var(--text-primary);
+            border-color: var(--accent-blue);
+        }
+        
+        .entradas-list {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .entradas-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .entradas-list::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        .entradas-list::-webkit-scrollbar-thumb {
+            background: var(--accent-red);
+            border-radius: 4px;
+        }
+        
+        .entrada-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+        
+        .entrada-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateX(5px);
+        }
+        
+        .entrada-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .entrada-titulo {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .entrada-data {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        .entrada-conteudo {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .entrada-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .entrada-topico {
+            background: rgba(255, 0, 85, 0.1);
+            color: var(--accent-red);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+        
+        .entrada-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .action-btn:hover {
+            color: var(--accent-blue);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+            opacity: 0.5;
+        }
+        
+        /* Modal de Visualização */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background: rgba(17, 17, 24, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .modal-close:hover {
+            color: var(--accent-red);
+        }
+        
+        .modal-titulo {
+            font-size: 2rem;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        
+        .modal-meta {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .modal-conteudo {
+            color: var(--text-primary);
+            line-height: 1.8;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+        
+        .modal-conteudo p {
+            margin-bottom: 15px;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .diario-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: static;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .diario-container {
+                padding: 10px;
+            }
+            
+            .diario-header,
+            .nova-entrada,
+            .entradas-container {
+                padding: 20px;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .header-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .entrada-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .entrada-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .entrada-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .sidebar-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .entrada-filtros {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles-container"></div>
+    <div class="scan-line"></div>
+    <div class="glitch-overlay"></div>
+    
+    <div class="diario-container">
+        <!-- Sidebar - Perfil -->
+        <aside class="sidebar">
+            <div class="profile-section">
+                <div class="profile-image-wrapper">
+                    <img src="https://cdn.discordapp.com/attachments/1415484714130739290/1446225200982130759/20251129_132749.jpg?ex=693335ad&is=6931e42d&hm=5f845fcac10fc24a5b975d1c5cb27fbf10a70744ff75b1cf153e2dfe104039c5" 
+                         alt="Erik" 
+                         class="profile-img">
+                    <div class="profile-glow"></div>
+                </div>
+                
+                <h2 class="profile-name">Erik Slava</h2>
+                <p class="profile-title">Proprietário do Diário</p>
+            </div>
+            
+            <div class="profile-info">
+                <div class="info-item">
+                    <i class="fas fa-user"></i>
+                    <span class="info-label">Nome:</span>
+                    <span class="info-value">Erik</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-birthday-cake"></i>
+                    <span class="info-label">Nascimento:</span>
+                    <span class="info-value">30/07/2008</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-calculator"></i>
+                    <span class="info-label">Idade:</span>
+                    <span class="info-value" id="user-age">16</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span class="info-label">Membro desde:</span>
+                    <span class="info-value">2024</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-entries">0</div>
+                    <div class="stat-label">Entradas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="total-topics">0</div>
+                    <div class="stat-label">Tópicos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="entries-week">0</div>
+                    <div class="stat-label">Esta semana</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="streak-days">0</div>
+                    <div class="stat-label">Dias seguidos</div>
+                </div>
+            </div>
+            
+            <button class="logout-btn" id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                SAIR DO DIÁRIO
+            </button>
+        </aside>
+        
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <!-- Cabeçalho do Diário -->
+            <header class="diario-header">
+                <div class="header-title">
+                    <h1>📖 Meu Diário Pessoal</h1>
+                    <div class="date-display" id="current-date"></div>
+                </div>
+                <p>Seu espaço seguro para reflexões, pensamentos e memórias.</p>
+            </header>
+            
+            <!-- Nova Entrada -->
+            <section class="nova-entrada">
+                <h2 class="section-title">
+                    <i class="fas fa-plus-circle"></i>
+                    Nova Entrada
+                </h2>
+                
+                <form id="entry-form">
+                    <div class="form-group">
+                        <label for="entry-title">Título</label>
+                        <input type="text" 
+                               id="entry-title" 
+                               class="form-control" 
+                               placeholder="Dê um título para sua entrada..."
+                               maxlength="100"
+                               required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="entry-topic">Tópico</label>
+                        <select id="entry-topic" class="form-control" required>
+                            <option value="">Selecione um tópico</option>
+                            <option value="Pessoal">👤 Pessoal</option>
+                            <option value="Reflexões">🤔 Reflexões</option>
+                            <option value="Sonhos">💭 Sonhos</option>
+                            <option value="Metas">🎯 Metas</option>
+                            <option value="Memórias">📸 Memórias</option>
+                            <option value="Aprendizados">📚 Aprendizados</option>
+                            <option value="Emoções">💖 Emoções</option>
+                            <option value="Criatividade">🎨 Criatividade</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="entry-content">Conteúdo</label>
+                        <textarea id="entry-content" 
+                                  class="form-control" 
+                                  placeholder="Escreva seus pensamentos aqui..."
+                                  rows="8"
+                                  required></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            SALVAR ENTRADA
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="clear-form">
+                            <i class="fas fa-broom"></i>
+                            LIMPAR
+                        </button>
+                    </div>
+                </form>
+            </section>
+            
+            <!-- Entradas Anteriores -->
+            <section class="entradas-container">
+                <h2 class="section-title">
+                    <i class="fas fa-history"></i>
+                    Entradas Anteriores
+                </h2>
+                
+                <div class="entrada-filtros">
+                    <button class="filtro-btn active" data-filter="all">Todas</button>
+                    <button class="filtro-btn" data-filter="Pessoal">Pessoal</button>
+                    <button class="filtro-btn" data-filter="Reflexões">Reflexões</button>
+                    <button class="filtro-btn" data-filter="Sonhos">Sonhos</button>
+                    <button class="filtro-btn" data-filter="Metas">Metas</button>
+                </div>
+                
+                <div class="entradas-list" id="entries-list">
+                    <!-- Entradas serão carregadas aqui via JavaScript -->
+                    <div class="empty-state">
+                        <i class="fas fa-book-open"></i>
+                        <h3>Nenhuma entrada ainda</h3>
+                        <p>Comece escrevendo sua primeira entrada acima!</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Modal para visualização completa -->
+    <div class="modal" id="entry-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+            
+            <h2 class="modal-titulo" id="modal-title"></h2>
+            
+            <div class="modal-meta">
+                <span id="modal-date"></span>
+                <span id="modal-topic"></span>
+            </div>
+            
+            <div class="modal-conteudo" id="modal-content"></div>
+            
+            <div class="form-actions">
+                <button class="btn btn-secondary" id="modal-edit">
+                    <i class="fas fa-edit"></i>
+                    EDITAR
+                </button>
+                <button class="btn btn-primary" id="modal-delete">
+                    <i class="fas fa-trash"></i>
+                    EXCLUIR
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="diario.js"></script>
+</body>
+</html>
