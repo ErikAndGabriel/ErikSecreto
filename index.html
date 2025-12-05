@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diário Pessoal - Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <div class="login-box">
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h1>Diário Pessoal</h1>
+                <p class="subtitle">Acesso restrito a Erik</p>
+            </div>
+            
+            <div id="login-form" class="form-container">
+                <div class="input-group">
+                    <label for="username"><i class="fas fa-user"></i> Usuário</label>
+                    <input type="text" id="username" placeholder="Digite seu usuário">
+                    <div class="error-message" id="username-error"></div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password"><i class="fas fa-key"></i> Senha</label>
+                    <input type="password" id="password" placeholder="Digite sua senha">
+                    <div class="error-message" id="password-error"></div>
+                </div>
+                
+                <div class="attempts-info">
+                    <p><i class="fas fa-shield-alt"></i> Tentativas restantes: <span id="attempts-remaining">3</span></p>
+                </div>
+                
+                <button id="login-btn" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Acessar Diário
+                </button>
+                
+                <div class="security-notice">
+                    <p><i class="fas fa-exclamation-triangle"></i> Acesso monitorado por segurança</p>
+                </div>
+            </div>
+            
+            <div id="verification-form" class="form-container hidden">
+                <div class="verification-header">
+                    <i class="fas fa-user-shield verification-icon"></i>
+                    <h2>Verificação de Segurança</h2>
+                    <p>Enviamos um código de verificação para o webhook</p>
+                </div>
+                
+                <div class="input-group">
+                    <label for="verification-code"><i class="fas fa-qrcode"></i> Código de Verificação</label>
+                    <input type="text" id="verification-code" placeholder="Digite o código de 6 dígitos">
+                    <div class="error-message" id="code-error"></div>
+                </div>
+                
+                <div class="attempts-info">
+                    <p><i class="fas fa-shield-alt"></i> Tentativas de código: <span id="code-attempts-remaining">5</span></p>
+                </div>
+                
+                <button id="verify-btn" class="btn-verify">
+                    <i class="fas fa-check-circle"></i> Verificar Código
+                </button>
+                
+                <button id="back-btn" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Voltar ao Login
+                </button>
+                
+                <div class="security-notice">
+                    <p><i class="fas fa-info-circle"></i> O código foi enviado via webhook do Discord</p>
+                </div>
+            </div>
+            
+            <div id="location-form" class="form-container hidden">
+                <div class="location-header">
+                    <i class="fas fa-map-marker-alt location-icon"></i>
+                    <h2>Verificação de Localização</h2>
+                    <p>É necessário permitir acesso à localização para continuar</p>
+                </div>
+                
+                <div class="location-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Ao recusar a permissão, seu IP será bloqueado por 5 minutos</p>
+                </div>
+                
+                <div class="location-buttons">
+                    <button id="allow-location-btn" class="btn-location allow">
+                        <i class="fas fa-check"></i> Permitir Localização
+                    </button>
+                    <button id="deny-location-btn" class="btn-location deny">
+                        <i class="fas fa-times"></i> Recusar Localização
+                    </button>
+                </div>
+                
+                <div class="security-notice">
+                    <p><i class="fas fa-globe"></i> Sua localização será enviada via webhook para registro de segurança</p>
+                </div>
+            </div>
+            
+            <div id="banned-message" class="form-container hidden">
+                <div class="banned-header">
+                    <i class="fas fa-ban banned-icon"></i>
+                    <h2>Acesso Bloqueado</h2>
+                    <p class="banned-timer">Seu IP foi bloqueado por <span id="ban-time">05:00</span> minutos</p>
+                </div>
+                
+                <div class="banned-info">
+                    <p><i class="fas fa-info-circle"></i> Motivo: Múltiplas tentativas de acesso falhas</p>
+                    <p><i class="fas fa-clock"></i> O bloqueio será removido automaticamente após o tempo expirar</p>
+                    <p><i class="fas fa-desktop"></i> Seu IP: <span id="banned-ip">Carregando...</span></p>
+                </div>
+                
+                <div class="security-notice">
+                    <p><i class="fas fa-user-secret"></i> Sistema de segurança ativado por Erik</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Sistema de Diário Pessoal de Erik &copy; <span id="current-year"></span></p>
+            <p class="security-tag"><i class="fas fa-shield-alt"></i> Protegido contra força bruta</p>
+        </div>
+    </div>
+    
+    <!-- Imagem de transição (hidden por padrão) -->
+    <div id="transition-screen" class="transition-screen hidden">
+        <div class="transition-content">
+            <img id="transition-image" src="" alt="Erik">
+            <p class="transition-text">Carregando diário pessoal...</p>
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
