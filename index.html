@@ -3,135 +3,364 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diário Pessoal - Login</title>
-    <link rel="stylesheet" href="style.css">
+    <title>🔒 Diário Secreto - Erik</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
 </head>
 <body>
+    <!-- Efeitos de fundo -->
+    <div class="particles-container"></div>
+    <div class="scan-line"></div>
+    <div class="glitch-overlay"></div>
+    
     <div class="container">
-        <div class="login-box">
-            <div class="logo-container">
-                <div class="logo">
-                    <i class="fas fa-lock"></i>
-                </div>
-                <h1>Diário Pessoal</h1>
-                <p class="subtitle">Acesso restrito a Erik</p>
-            </div>
-            
-            <div id="login-form" class="form-container">
-                <div class="input-group">
-                    <label for="username"><i class="fas fa-user"></i> Usuário</label>
-                    <input type="text" id="username" placeholder="Digite seu usuário">
-                    <div class="error-message" id="username-error"></div>
-                </div>
-                
-                <div class="input-group">
-                    <label for="password"><i class="fas fa-key"></i> Senha</label>
-                    <input type="password" id="password" placeholder="Digite sua senha">
-                    <div class="error-message" id="password-error"></div>
+        <!-- TELA DE LOGIN -->
+        <div id="login-screen" class="screen active">
+            <div class="login-card">
+                <!-- Cabeçalho com logo -->
+                <div class="logo-header">
+                    <div class="logo-icon pulse">
+                        <i class="fas fa-book-dead"></i>
+                    </div>
+                    <h1 class="neon-text">
+                        <span class="neon-red">DIÁRIO</span>
+                        <span class="neon-blue">PESSOAL</span>
+                    </h1>
+                    <p class="subtitle">Sistema de Registros Confidenciais • Erik Slava</p>
                 </div>
                 
-                <div class="attempts-info">
-                    <p><i class="fas fa-shield-alt"></i> Tentativas restantes: <span id="attempts-remaining">3</span></p>
-                </div>
-                
-                <button id="login-btn" class="btn-login">
-                    <i class="fas fa-sign-in-alt"></i> Acessar Diário
-                </button>
-                
-                <div class="security-notice">
-                    <p><i class="fas fa-exclamation-triangle"></i> Acesso monitorado por segurança</p>
-                </div>
-            </div>
-            
-            <div id="verification-form" class="form-container hidden">
-                <div class="verification-header">
-                    <i class="fas fa-user-shield verification-icon"></i>
-                    <h2>Verificação de Segurança</h2>
-                    <p>Enviamos um código de verificação para o webhook</p>
-                </div>
-                
-                <div class="input-group">
-                    <label for="verification-code"><i class="fas fa-qrcode"></i> Código de Verificação</label>
-                    <input type="text" id="verification-code" placeholder="Digite o código de 6 dígitos">
-                    <div class="error-message" id="code-error"></div>
-                </div>
-                
-                <div class="attempts-info">
-                    <p><i class="fas fa-shield-alt"></i> Tentativas de código: <span id="code-attempts-remaining">5</span></p>
-                </div>
-                
-                <button id="verify-btn" class="btn-verify">
-                    <i class="fas fa-check-circle"></i> Verificar Código
-                </button>
-                
-                <button id="back-btn" class="btn-back">
-                    <i class="fas fa-arrow-left"></i> Voltar ao Login
-                </button>
-                
-                <div class="security-notice">
-                    <p><i class="fas fa-info-circle"></i> O código foi enviado via webhook do Discord</p>
-                </div>
-            </div>
-            
-            <div id="location-form" class="form-container hidden">
-                <div class="location-header">
-                    <i class="fas fa-map-marker-alt location-icon"></i>
-                    <h2>Verificação de Localização</h2>
-                    <p>É necessário permitir acesso à localização para continuar</p>
-                </div>
-                
-                <div class="location-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <p>Ao recusar a permissão, seu IP será bloqueado por 5 minutos</p>
-                </div>
-                
-                <div class="location-buttons">
-                    <button id="allow-location-btn" class="btn-location allow">
-                        <i class="fas fa-check"></i> Permitir Localização
+                <!-- Formulário de Login -->
+                <div class="login-form">
+                    <div class="input-field animated">
+                        <div class="input-label">
+                            <i class="fas fa-user-ninja"></i>
+                            <span>IDENTIFICAÇÃO</span>
+                        </div>
+                        <input type="text" id="username" placeholder="Digite seu usuário" autocomplete="off" spellcheck="false">
+                        <div class="input-line"></div>
+                        <div class="input-error" id="username-error"></div>
+                    </div>
+                    
+                    <div class="input-field animated">
+                        <div class="input-label">
+                            <i class="fas fa-fingerprint"></i>
+                            <span>SENHA CRIPTOGRAFADA</span>
+                        </div>
+                        <input type="password" id="password" placeholder="••••••••••" autocomplete="off" spellcheck="false">
+                        <div class="input-line"></div>
+                        <button class="toggle-password" type="button">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="input-error" id="password-error"></div>
+                    </div>
+                    
+                    <!-- Status de Segurança -->
+                    <div class="security-panel">
+                        <div class="security-item">
+                            <div class="security-icon">
+                                <i class="fas fa-shield-halved"></i>
+                            </div>
+                            <div class="security-info">
+                                <span class="security-label">Tentativas Restantes</span>
+                                <span class="security-value" id="attempts-count">3</span>
+                            </div>
+                        </div>
+                        
+                        <div class="security-item">
+                            <div class="security-icon">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                            <div class="security-info">
+                                <span class="security-label">Seu IP</span>
+                                <span class="security-value" id="user-ip">Carregando...</span>
+                            </div>
+                        </div>
+                        
+                        <div class="security-item">
+                            <div class="security-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="security-info">
+                                <span class="security-label">Horário</span>
+                                <span class="security-value" id="current-time">00:00:00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botão de Login -->
+                    <button id="login-btn" class="cyber-btn">
+                        <span class="cyber-btn-content">
+                            <i class="fas fa-terminal"></i>
+                            <span>INICIAR VERIFICAÇÃO</span>
+                        </span>
+                        <span class="cyber-btn-glitch"></span>
+                        <span class="cyber-btn-light"></span>
                     </button>
-                    <button id="deny-location-btn" class="btn-location deny">
-                        <i class="fas fa-times"></i> Recusar Localização
-                    </button>
+                    
+                    <!-- Notificação do Sistema -->
+                    <div class="system-notice">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Sistema protegido contra força bruta • Máximo de 3 tentativas</p>
+                    </div>
                 </div>
                 
-                <div class="security-notice">
-                    <p><i class="fas fa-globe"></i> Sua localização será enviada via webhook para registro de segurança</p>
-                </div>
-            </div>
-            
-            <div id="banned-message" class="form-container hidden">
-                <div class="banned-header">
-                    <i class="fas fa-ban banned-icon"></i>
-                    <h2>Acesso Bloqueado</h2>
-                    <p class="banned-timer">Seu IP foi bloqueado por <span id="ban-time">05:00</span> minutos</p>
-                </div>
-                
-                <div class="banned-info">
-                    <p><i class="fas fa-info-circle"></i> Motivo: Múltiplas tentativas de acesso falhas</p>
-                    <p><i class="fas fa-clock"></i> O bloqueio será removido automaticamente após o tempo expirar</p>
-                    <p><i class="fas fa-desktop"></i> Seu IP: <span id="banned-ip">Carregando...</span></p>
-                </div>
-                
-                <div class="security-notice">
-                    <p><i class="fas fa-user-secret"></i> Sistema de segurança ativado por Erik</p>
+                <!-- Rodapé -->
+                <div class="login-footer">
+                    <div class="status-indicator online">
+                        <div class="status-dot"></div>
+                        <span>SISTEMA ATIVO</span>
+                    </div>
+                    <p class="copyright">© 2024 Diário Pessoal • Erik Slava • Todos os direitos reservados</p>
                 </div>
             </div>
         </div>
         
-        <div class="footer">
-            <p>Sistema de Diário Pessoal de Erik &copy; <span id="current-year"></span></p>
-            <p class="security-tag"><i class="fas fa-shield-alt"></i> Protegido contra força bruta</p>
+        <!-- TELA DE VERIFICAÇÃO -->
+        <div id="verification-screen" class="screen">
+            <div class="verification-card">
+                <!-- Cabeçalho -->
+                <div class="verification-header">
+                    <div class="verification-icon spin">
+                        <i class="fas fa-user-lock"></i>
+                    </div>
+                    <h2 class="neon-text">
+                        <span class="neon-purple">VERIFICAÇÃO</span>
+                        <span class="neon-green">2FA</span>
+                    </h2>
+                    <p class="verification-subtitle">Autenticação de Dois Fatores • Código enviado via Webhook</p>
+                </div>
+                
+                <!-- Entrada do Código -->
+                <div class="code-section">
+                    <div class="code-inputs">
+                        <input type="text" maxlength="1" class="code-digit" data-index="0">
+                        <input type="text" maxlength="1" class="code-digit" data-index="1">
+                        <input type="text" maxlength="1" class="code-digit" data-index="2">
+                        <span class="code-dash">-</span>
+                        <input type="text" maxlength="1" class="code-digit" data-index="3">
+                        <input type="text" maxlength="1" class="code-digit" data-index="4">
+                        <input type="text" maxlength="1" class="code-digit" data-index="5">
+                    </div>
+                    
+                    <div class="code-instructions">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Digite o código de 6 dígitos enviado para o Discord</p>
+                    </div>
+                    
+                    <div class="code-error" id="code-error"></div>
+                </div>
+                
+                <!-- Informações da Verificação -->
+                <div class="verification-info">
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-bomb"></i>
+                        </div>
+                        <div class="info-content">
+                            <span class="info-label">Tentativas de Código</span>
+                            <span class="info-value" id="code-attempts">5</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-hourglass-end"></i>
+                        </div>
+                        <div class="info-content">
+                            <span class="info-label">Tempo Restante</span>
+                            <span class="info-value" id="code-timer">05:00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-icon">
+                            <i class="fas fa-broadcast-tower"></i>
+                        </div>
+                        <div class="info-content">
+                            <span class="info-label">Webhook Status</span>
+                            <span class="info-value online">ATIVO</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botões -->
+                <div class="verification-buttons">
+                    <button id="verify-btn" class="cyber-btn success">
+                        <span class="cyber-btn-content">
+                            <i class="fas fa-check-double"></i>
+                            <span>VALIDAR E ACESSAR</span>
+                        </span>
+                    </button>
+                    
+                    <button id="back-btn" class="cyber-btn secondary">
+                        <span class="cyber-btn-content">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>VOLTAR</span>
+                        </span>
+                    </button>
+                    
+                    <button id="resend-btn" class="cyber-btn ghost">
+                        <span class="cyber-btn-content">
+                            <i class="fas fa-redo"></i>
+                            <span>REENVIAR CÓDIGO</span>
+                        </span>
+                    </button>
+                </div>
+                
+                <!-- Aviso de Segurança -->
+                <div class="security-warning">
+                    <i class="fas fa-shield-alt"></i>
+                    <p>Acesso monitorado • Todas as tentativas são registradas</p>
+                </div>
+            </div>
         </div>
-    </div>
-    
-    <!-- Imagem de transição (hidden por padrão) -->
-    <div id="transition-screen" class="transition-screen hidden">
-        <div class="transition-content">
-            <img id="transition-image" src="" alt="Erik">
-            <p class="transition-text">Carregando diário pessoal...</p>
-            <div class="loading-spinner"></div>
+        
+        <!-- TELA DE BLOQUEIO -->
+        <div id="banned-screen" class="screen">
+            <div class="banned-card">
+                <!-- Cabeçalho -->
+                <div class="banned-header">
+                    <div class="banned-icon">
+                        <i class="fas fa-skull-crossbones"></i>
+                    </div>
+                    <h2 class="error-text">ACESSO TEMPORARIAMENTE BLOQUEADO</h2>
+                    <p class="banned-subtitle">Sistema de Segurança Ativado • Violação Detectada</p>
+                </div>
+                
+                <!-- Timer de Bloqueio -->
+                <div class="ban-timer-container">
+                    <div class="timer-wrapper">
+                        <div class="timer-circle">
+                            <svg width="220" height="220">
+                                <circle class="timer-bg" cx="110" cy="110" r="100"></circle>
+                                <circle class="timer-progress" cx="110" cy="110" r="100"></circle>
+                            </svg>
+                            <div class="timer-text">
+                                <div class="timer-main">
+                                    <span id="ban-minutes">05</span>
+                                    <span class="timer-label">min</span>
+                                </div>
+                                <div class="timer-separator">:</div>
+                                <div class="timer-main">
+                                    <span id="ban-seconds">00</span>
+                                    <span class="timer-label">seg</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informações do Bloqueio -->
+                    <div class="ban-info">
+                        <div class="ban-item">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <div class="ban-details">
+                                <span class="ban-label">Motivo do Bloqueio</span>
+                                <span class="ban-value">Tentativas excessivas falhas</span>
+                            </div>
+                        </div>
+                        
+                        <div class="ban-item">
+                            <i class="fas fa-address-card"></i>
+                            <div class="ban-details">
+                                <span class="ban-label">IP Bloqueado</span>
+                                <span class="ban-value" id="banned-ip">Carregando...</span>
+                            </div>
+                        </div>
+                        
+                        <div class="ban-item">
+                            <i class="fas fa-calendar-times"></i>
+                            <div class="ban-details">
+                                <span class="ban-label">Desbloqueio em</span>
+                                <span class="ban-value" id="ban-expiry">--:--:--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mensagem do Sistema -->
+                <div class="ban-message">
+                    <div class="message-item">
+                        <i class="fas fa-user-shield"></i>
+                        <p>Seu endereço IP foi temporariamente bloqueado por medidas de segurança.</p>
+                    </div>
+                    <div class="message-item">
+                        <i class="fas fa-clock"></i>
+                        <p>O acesso será restaurado automaticamente após o término do bloqueio.</p>
+                    </div>
+                    <div class="message-item">
+                        <i class="fas fa-brain"></i>
+                        <p>Sistema de proteção ErikSlava v4.0 • Anti-Brute Force Ativo</p>
+                    </div>
+                </div>
+                
+                <!-- Rodapé -->
+                <div class="ban-footer">
+                    <div class="security-badge">
+                        <i class="fas fa-lock"></i>
+                        <span>SISTEMA PROTEGIDO</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TELA DE TRANSIÇÃO -->
+        <div id="transition-screen" class="screen">
+            <div class="transition-card">
+                <div class="transition-content">
+                    <!-- Foto de Perfil -->
+                    <div class="profile-image-container">
+                        <img src="https://cdn.discordapp.com/attachments/1415484714130739290/1446225200982130759/20251129_132749.jpg?ex=693335ad&is=6931e42d&hm=5f845fcac10fc24a5b975d1c5cb27fbf10a70744ff75b1cf153e2dfe104039c5" 
+                             alt="Erik" 
+                             class="profile-image">
+                        <div class="profile-glow"></div>
+                        <div class="profile-ring"></div>
+                    </div>
+                    
+                    <!-- Mensagem de Boas-vindas -->
+                    <div class="welcome-message">
+                        <h2 class="neon-text">
+                            <span class="neon-cyan">ACESSO</span>
+                            <span class="neon-pink">CONCEDIDO</span>
+                        </h2>
+                        <p class="welcome-text">Bem-vindo de volta, <span class="highlight">Erik</span></p>
+                        <p class="loading-text">Inicializando seu diário pessoal...</p>
+                    </div>
+                    
+                    <!-- Barra de Progresso -->
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span class="progress-percent">0%</span>
+                            <span class="progress-status">Carregando módulos de segurança</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Informações do Sistema -->
+                    <div class="system-loading">
+                        <div class="loading-item">
+                            <i class="fas fa-database"></i>
+                            <span>Carregando registros...</span>
+                        </div>
+                        <div class="loading-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Verificando criptografia...</span>
+                        </div>
+                        <div class="loading-item">
+                            <i class="fas fa-book"></i>
+                            <span>Preparando interface...</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Contador Regressivo -->
+                    <div class="countdown">
+                        <i class="fas fa-hourglass-start"></i>
+                        <span>Redirecionando em <span id="countdown-timer">4</span> segundos</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
