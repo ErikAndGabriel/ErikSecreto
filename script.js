@@ -78,54 +78,172 @@ const elements = {
 // INICIALIZAÇÃO DO SISTEMA
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 Sistema do Diário Inicializando...');
-    initializeSystem();
+    console.log('🔧 Configurações:', CONFIG);
+    
+    // Adicionar estilos para debug
+    addDebugStyles();
+    
+    // Inicializar
+    setTimeout(() => {
+        initializeSystem();
+    }, 500);
 });
 
 async function initializeSystem() {
     try {
-        // Configurar elementos
+        console.log('1. Configurando elementos...');
         setupElements();
         
-        // Configurar eventos
+        console.log('2. Configurando eventos...');
         setupEventListeners();
         
-        // Inicializar funcionalidades
+        console.log('3. Inicializando funcionalidades...');
         await initializeFeatures();
         
-        // Verificar se está banido
+        console.log('4. Verificando banimento...');
         checkBanStatus();
         
         console.log('✅ Sistema inicializado com sucesso!');
+        showSystemStatus();
+        
     } catch (error) {
         console.error('❌ Erro na inicialização:', error);
         showError('Erro no sistema. Recarregue a página.');
     }
 }
 
+function addDebugStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .debug-panel {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: #00ff88;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 9999;
+            border: 1px solid #00ff88;
+            max-width: 300px;
+            display: none;
+        }
+        .debug-toggle {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: #ff0055;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            z-index: 10000;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Criar botão de debug
+    const debugBtn = document.createElement('button');
+    debugBtn.className = 'debug-toggle';
+    debugBtn.innerHTML = '🐛';
+    debugBtn.title = 'Debug Info';
+    debugBtn.onclick = toggleDebugPanel;
+    document.body.appendChild(debugBtn);
+    
+    // Criar painel de debug
+    const debugPanel = document.createElement('div');
+    debugPanel.className = 'debug-panel';
+    debugPanel.id = 'debug-panel';
+    document.body.appendChild(debugPanel);
+}
+
+function toggleDebugPanel() {
+    const panel = document.getElementById('debug-panel');
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    updateDebugInfo();
+}
+
+function updateDebugInfo() {
+    const panel = document.getElementById('debug-panel');
+    if (!panel) return;
+    
+    const info = `
+        === DEBUG INFO ===
+        Tela: ${state.currentScreen}
+        IP: ${state.userIP || 'Carregando...'}
+        Tentativas: ${state.passwordAttempts}
+        Código: ${state.verificationCode ? 'Gerado' : 'Não gerado'}
+        Banido: ${state.isBanned ? 'Sim' : 'Não'}
+        Token: ${localStorage.getItem('diario_auth') ? 'Sim' : 'Não'}
+        =================
+    `;
+    
+    panel.innerHTML = info.replace(/\n/g, '<br>');
+}
+
 function setupElements() {
+    console.log('🔍 Procurando elementos...');
+    
     // Configurar tempo atual
     updateClock();
     setInterval(updateClock, 1000);
     
     // Configurar visibilidade da senha
     if (elements.togglePassword) {
+        console.log('✅ Botão de visibilidade encontrado');
         elements.togglePassword.addEventListener('click', togglePasswordVisibility);
+    } else {
+        console.warn('⚠️ Botão de visibilidade não encontrado');
     }
     
     // Configurar entrada do código
     setupCodeInputs();
+    
+    // Verificar elementos críticos
+    checkCriticalElements();
+}
+
+function checkCriticalElements() {
+    const criticalElements = [
+        'login-btn', 'username', 'password', 
+        'verify-btn', 'code-digit', 'login-screen'
+    ];
+    
+    console.log('🔍 Verificando elementos críticos:');
+    criticalElements.forEach(id => {
+        const element = document.getElementById(id) || document.querySelector(`.${id}`);
+        console.log(`${id}:`, element ? '✅' : '❌');
+    });
 }
 
 function setupEventListeners() {
+    console.log('🎮 Configurando eventos...');
+    
     // Botão de login
     if (elements.loginBtn) {
+        console.log('✅ Botão de login configurado');
         elements.loginBtn.addEventListener('click', handleLogin);
+    } else {
+        console.error('❌ Botão de login não encontrado!');
+        // Criar botão de fallback
+        createFallbackLoginButton();
     }
     
     // Enter no login
     if (elements.passwordInput) {
         elements.passwordInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') handleLogin();
+            if (e.key === 'Enter') {
+                console.log('↵ Enter pressionado no campo de senha');
+                handleLogin();
+            }
         });
     }
     
@@ -136,16 +254,50 @@ function setupEventListeners() {
     
     // Botão de voltar
     if (elements.backBtn) {
-        elements.backBtn.addEventListener('click', () => showScreen('login'));
+        elements.backBtn.addEventListener('click', () => {
+            console.log('↩ Voltando para login');
+            showScreen('login');
+        });
     }
     
     // Botão de reenviar código
     if (elements.resendBtn) {
         elements.resendBtn.addEventListener('click', resendVerificationCode);
     }
+    
+    // Auto-focus no username
+    if (elements.usernameInput) {
+        setTimeout(() => {
+            elements.usernameInput.focus();
+        }, 1000);
+    }
+}
+
+function createFallbackLoginButton() {
+    console.log('🔧 Criando botão de login fallback...');
+    
+    const fallbackBtn = document.createElement('button');
+    fallbackBtn.textContent = 'LOGIN (Fallback)';
+    fallbackBtn.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #ff0055;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 9999;
+    `;
+    
+    fallbackBtn.onclick = handleLogin;
+    document.body.appendChild(fallbackBtn);
 }
 
 async function initializeFeatures() {
+    console.log('⚡ Inicializando funcionalidades...');
+    
     // Obter IP do usuário
     await getUserIP();
     
@@ -154,14 +306,28 @@ async function initializeFeatures() {
     
     // Animar elementos
     animateElements();
+    
+    // Criar token de teste se não existir
+    ensureTestToken();
+}
+
+function ensureTestToken() {
+    // Remover tokens antigos para teste
+    // localStorage.removeItem('diario_auth');
+    // localStorage.removeItem('diario_login_time');
 }
 
 // ANIMAÇÕES E EFEITOS VISUAIS
 function createParticles() {
     const container = document.querySelector('.particles-container');
-    if (!container) return;
+    if (!container) {
+        console.warn('⚠️ Container de partículas não encontrado');
+        return;
+    }
     
-    for (let i = 0; i < 50; i++) {
+    console.log('✨ Criando partículas...');
+    
+    for (let i = 0; i < 30; i++) {
         const particle = document.createElement('div');
         particle.style.cssText = `
             position: absolute;
@@ -169,7 +335,7 @@ function createParticles() {
             height: ${Math.random() * 3 + 1}px;
             background: ${Math.random() > 0.5 ? '#ff0055' : '#00a8ff'};
             border-radius: 50%;
-            opacity: ${Math.random() * 0.3 + 0.1};
+            opacity: ${Math.random() * 0.2 + 0.1};
             top: ${Math.random() * 100}%;
             left: ${Math.random() * 100}%;
             animation: floatParticle ${Math.random() * 20 + 10}s linear infinite;
@@ -194,21 +360,37 @@ function animateElements() {
 // FUNÇÕES DO SISTEMA
 async function getUserIP() {
     try {
-        const response = await fetch('https://api.ipify.org?format=json');
+        console.log('🌐 Obtendo IP do usuário...');
+        
+        // Primeiro tente com timeout curto
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout')), 3000)
+        );
+        
+        const ipPromise = fetch('https://api.ipify.org?format=json');
+        
+        const response = await Promise.race([ipPromise, timeoutPromise]);
         const data = await response.json();
+        
         state.userIP = data.ip;
+        console.log('✅ IP obtido:', state.userIP);
         
         if (elements.userIp) {
             elements.userIp.textContent = data.ip;
         }
         
+        updateDebugInfo();
+        
         return data.ip;
+        
     } catch (error) {
-        console.error('Erro ao obter IP:', error);
-        state.userIP = 'Não disponível';
+        console.warn('⚠️ Erro ao obter IP:', error.message);
+        
+        // IP fallback
+        state.userIP = '192.168.1.1 (Local)';
         
         if (elements.userIp) {
-            elements.userIp.textContent = 'Não disponível';
+            elements.userIp.textContent = 'Local (Offline)';
         }
         
         return 'Não disponível';
@@ -238,10 +420,17 @@ function togglePasswordVisibility() {
     
     elements.passwordInput.setAttribute('type', newType);
     icon.className = newType === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+    
+    console.log(`👁️ Senha ${newType === 'text' ? 'visível' : 'oculta'}`);
 }
 
 function setupCodeInputs() {
-    if (!elements.codeDigits || elements.codeDigits.length === 0) return;
+    if (!elements.codeDigits || elements.codeDigits.length === 0) {
+        console.warn('⚠️ Campos de código não encontrados');
+        return;
+    }
+    
+    console.log(`✅ ${elements.codeDigits.length} campos de código configurados`);
     
     elements.codeDigits.forEach((digit, index) => {
         digit.addEventListener('input', function(e) {
@@ -330,11 +519,15 @@ function showScreen(screenName) {
         targetScreen.classList.add('active');
         state.currentScreen = screenName;
         
+        console.log(`✅ Tela ${screenName} ativada`);
+        
         // Executar ações específicas para cada tela
         switch(screenName) {
             case 'login':
                 if (elements.usernameInput) {
-                    elements.usernameInput.focus();
+                    setTimeout(() => {
+                        elements.usernameInput.focus();
+                    }, 300);
                 }
                 break;
             case 'verification':
@@ -342,7 +535,9 @@ function showScreen(screenName) {
                 startCodeTimer();
                 resetCodeInputs();
                 if (elements.codeDigits && elements.codeDigits[0]) {
-                    elements.codeDigits[0].focus();
+                    setTimeout(() => {
+                        elements.codeDigits[0].focus();
+                    }, 300);
                 }
                 break;
             case 'banned':
@@ -352,6 +547,10 @@ function showScreen(screenName) {
                 startTransition();
                 break;
         }
+        
+        updateDebugInfo();
+    } else {
+        console.error(`❌ Tela ${screenName} não encontrada!`);
     }
 }
 
@@ -366,7 +565,13 @@ async function handleLogin() {
     const username = elements.usernameInput ? elements.usernameInput.value.trim() : '';
     const password = elements.passwordInput ? elements.passwordInput.value.trim() : '';
     
+    console.log('Credenciais inseridas:', { 
+        username, 
+        passwordLength: password.length 
+    });
+    
     if (!username || !password) {
+        console.log('❌ Campos vazios');
         showError(elements.usernameError, !username ? 'Digite o nome de usuário' : '');
         showError(elements.passwordError, !password ? 'Digite a senha' : '');
         return;
@@ -379,7 +584,7 @@ async function handleLogin() {
         elements.loginBtn.disabled = true;
         
         // Simular processamento
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 800));
         
         // Verificar credenciais
         if (username === CONFIG.USERNAME && password === CONFIG.PASSWORD) {
@@ -408,12 +613,13 @@ async function handleLogin() {
             
             // Enviar notificação de tentativa falha
             await sendWebhookNotification('login_failed', { 
-                username, 
+                username: username || 'vazio', 
                 attemptsLeft: state.passwordAttempts 
             });
             
             if (state.passwordAttempts <= 0) {
                 // Banir usuário
+                console.log('⛔ Banindo usuário por tentativas excessivas');
                 banUser();
             } else {
                 showError(elements.passwordError, 'Usuário ou senha incorretos');
@@ -427,6 +633,8 @@ async function handleLogin() {
         // Restaurar botão
         elements.loginBtn.innerHTML = originalText;
         elements.loginBtn.disabled = false;
+        
+        updateDebugInfo();
     }
 }
 
@@ -436,6 +644,7 @@ function generateVerificationCode() {
     state.codeExpiry = Date.now() + (5 * 60 * 1000); // 5 minutos
     
     console.log(`🔢 Código gerado: ${state.verificationCode}`);
+    console.log(`⏰ Expira em: ${new Date(state.codeExpiry).toLocaleTimeString()}`);
     
     // Enviar código via webhook
     sendWebhookNotification('verification_code', { code: state.verificationCode });
@@ -476,6 +685,7 @@ async function handleVerification() {
     clearErrors();
     
     const enteredCode = getCodeValue();
+    console.log('Código inserido:', enteredCode);
     
     if (enteredCode.length !== 6) {
         showError(elements.codeError, 'Código deve ter 6 dígitos');
@@ -488,7 +698,7 @@ async function handleVerification() {
     elements.verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> VALIDANDO...';
     elements.verifyBtn.disabled = true;
     
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 800));
     
     if (enteredCode === state.verificationCode) {
         console.log('✅ Código correto!');
@@ -519,6 +729,7 @@ async function handleVerification() {
         });
         
         if (state.codeAttempts <= 0) {
+            console.log('⛔ Banindo por códigos incorretos');
             banUser();
         } else {
             showError(elements.codeError, 'Código de verificação incorreto');
@@ -533,6 +744,8 @@ async function handleVerification() {
 async function resendVerificationCode() {
     if (!elements.resendBtn) return;
     
+    console.log('🔄 Reenviando código...');
+    
     const originalText = elements.resendBtn.innerHTML;
     elements.resendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ENVIANDO...';
     elements.resendBtn.disabled = true;
@@ -544,7 +757,7 @@ async function resendVerificationCode() {
     elements.resendBtn.innerHTML = originalText;
     elements.resendBtn.disabled = false;
     
-    showError(elements.codeError, 'Novo código enviado!');
+    showError(elements.codeError, '✅ Novo código enviado!');
 }
 
 // SISTEMA DE BANIMENTO
@@ -556,7 +769,9 @@ function banUser() {
     
     // Salvar no localStorage
     localStorage.setItem('diario_ban_end', state.banEndTime);
-    localStorage.setItem('diario_ban_ip', state.userIP);
+    localStorage.setItem('diario_ban_ip', state.userIP || 'unknown');
+    
+    console.log(`⏰ Banido até: ${new Date(state.banEndTime).toLocaleTimeString()}`);
     
     // Enviar notificação
     sendWebhookNotification('user_banned', { 
@@ -569,6 +784,8 @@ function banUser() {
 }
 
 function checkBanStatus() {
+    console.log('🔍 Verificando status de banimento...');
+    
     const banEnd = localStorage.getItem('diario_ban_end');
     const banIP = localStorage.getItem('diario_ban_ip');
     
@@ -576,16 +793,25 @@ function checkBanStatus() {
         const now = Date.now();
         const banEndTime = parseInt(banEnd);
         
-        if (now < banEndTime && banIP === state.userIP) {
+        console.log('Ban encontrado:', {
+            banEndTime: new Date(banEndTime).toLocaleString(),
+            banIP,
+            userIP: state.userIP
+        });
+        
+        if (now < banEndTime && (banIP === state.userIP || banIP === 'unknown')) {
             state.isBanned = true;
             state.banEndTime = banEndTime;
             showScreen('banned');
             return true;
         } else {
             // Remover banimento expirado
+            console.log('Banimento expirado ou IP diferente, removendo...');
             localStorage.removeItem('diario_ban_end');
             localStorage.removeItem('diario_ban_ip');
         }
+    } else {
+        console.log('Nenhum banimento ativo');
     }
     
     return false;
@@ -594,12 +820,15 @@ function checkBanStatus() {
 function updateBanTimerDisplay() {
     if (!state.isBanned || !state.banEndTime) return;
     
+    console.log('⏱️ Iniciando timer de banimento...');
+    
     const updateTimer = () => {
         const now = Date.now();
         const timeLeft = state.banEndTime - now;
         
         if (timeLeft <= 0) {
             // Desbanir usuário
+            console.log('✅ Banimento expirado!');
             state.isBanned = false;
             localStorage.removeItem('diario_ban_end');
             localStorage.removeItem('diario_ban_ip');
@@ -648,12 +877,41 @@ function updateBanTimerDisplay() {
 
 // SISTEMA DE TRANSIÇÃO
 function startTransition() {
-    console.log('🚀 Iniciando transição...');
+    console.log('🚀 Iniciando transição para o diário...');
+    console.log('=== ETAPA 1: Preparando sistema ===');
+    
+    // 1. Criar token de autenticação
+    console.log('🔐 Criando token de autenticação...');
+    createAuthToken();
+    
+    // 2. Verificar se o token foi criado
+    console.log('🔍 Verificando token...');
+    const savedToken = localStorage.getItem('diario_auth');
+    const loginTime = localStorage.getItem('diario_login_time');
+    
+    console.log('Token salvo:', savedToken ? '✅ Sim' : '❌ Não');
+    console.log('Login time:', loginTime ? '✅ Sim' : '❌ Não');
+    
+    if (!savedToken) {
+        console.error('❌ CRÍTICO: Token não foi criado!');
+        console.log('Tentando criar novamente...');
+        createAuthToken();
+    }
+    
+    // 3. Mostrar progresso
+    console.log('📊 Iniciando contagem regressiva...');
     
     let timeLeft = CONFIG.TRANSITION_TIME;
     let progress = 0;
     
+    // Atualizar texto inicial
+    if (elements.countdownTimer) {
+        elements.countdownTimer.textContent = timeLeft;
+    }
+    
     const updateTransition = () => {
+        console.log(`⏱️ Redirecionando em ${timeLeft} segundos...`);
+        
         // Atualizar contador
         if (elements.countdownTimer) {
             elements.countdownTimer.textContent = timeLeft;
@@ -671,6 +929,11 @@ function startTransition() {
         timeLeft--;
         
         if (timeLeft < 0) {
+            console.log('=== ETAPA FINAL: Redirecionando ===');
+            console.log('🔗 Redirecionando para diario.html...');
+            console.log('Token atual:', localStorage.getItem('diario_auth'));
+            console.log('Login time:', localStorage.getItem('diario_login_time'));
+            
             // Redirecionar para o diário
             window.location.href = 'diario.html';
         } else {
@@ -681,9 +944,62 @@ function startTransition() {
     updateTransition();
 }
 
+// Função para criar token de autenticação (CORRIGIDA)
+function createAuthToken() {
+    console.log('=== CRIANDO TOKEN DE AUTENTICAÇÃO ===');
+    
+    try {
+        // 1. Criar dados do token
+        const tokenData = {
+            userId: 'ErikSlava',
+            timestamp: Date.now(),
+            exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // Expira em 24 horas
+        };
+        
+        console.log('Dados do token:', tokenData);
+        
+        // 2. Codificar para base64
+        const jsonString = JSON.stringify(tokenData);
+        console.log('JSON string:', jsonString);
+        
+        const token = btoa(jsonString);
+        console.log('Token codificado:', token);
+        
+        // 3. Verificar se pode decodificar
+        const decoded = atob(token);
+        console.log('Token decodificado:', decoded);
+        
+        // 4. Salvar no localStorage
+        localStorage.setItem('diario_auth', token);
+        localStorage.setItem('diario_login_time', Date.now().toString());
+        
+        console.log('✅ Token salvo com sucesso!');
+        console.log('LocalStorage verificado:', {
+            auth: localStorage.getItem('diario_auth') ? 'Presente' : 'Ausente',
+            loginTime: localStorage.getItem('diario_login_time')
+        });
+        
+        return token;
+        
+    } catch (error) {
+        console.error('❌ ERRO ao criar token:', error);
+        console.error('Mensagem:', error.message);
+        
+        // Fallback: token simples
+        const fallbackToken = 'eyJ1c2VySWQiOiJFcmlrU2xhdmEiLCJ0aW1lc3RhbXAiOjE3MTcyODAwMDAwMDAsImV4cCI6MTcxNzM2NjQwMDAwMH0=';
+        localStorage.setItem('diario_auth', fallbackToken);
+        localStorage.setItem('diario_login_time', Date.now().toString());
+        
+        console.log('✅ Token fallback criado');
+        return fallbackToken;
+    }
+}
+
 // WEBHOOK NOTIFICATIONS
 async function sendWebhookNotification(type, data) {
     try {
+        console.log(`🌐 Enviando webhook: ${type}`);
+        
         const messages = {
             'login_success': `✅ **LOGIN BEM-SUCEDIDO**\n👤 Usuário: ${data.username}\n🌐 IP: ${state.userIP}\n⏰ ${new Date().toLocaleString('pt-BR')}`,
             'login_failed': `❌ **TENTATIVA DE LOGIN FALHOU**\n👤 Usuário: ${data.username}\n🌐 IP: ${state.userIP}\n🔢 Tentativas restantes: ${data.attemptsLeft}\n⏰ ${new Date().toLocaleString('pt-BR')}`,
@@ -699,6 +1015,8 @@ async function sendWebhookNotification(type, data) {
             avatar_url: CONFIG.PROFILE_IMAGE
         };
         
+        console.log('Payload:', payload);
+        
         const response = await fetch(CONFIG.WEBHOOK_URL, {
             method: 'POST',
             headers: {
@@ -707,9 +1025,11 @@ async function sendWebhookNotification(type, data) {
             body: JSON.stringify(payload)
         });
         
+        console.log(`Webhook ${type}: ${response.ok ? '✅ Enviado' : '❌ Falha'}`);
         return response.ok;
+        
     } catch (error) {
-        console.error('Erro ao enviar webhook:', error);
+        console.error('❌ Erro ao enviar webhook:', error);
         return false;
     }
 }
@@ -733,60 +1053,93 @@ function showError(element, message) {
         element.textContent = '';
     }, 5000);
 }
-// No final do arquivo script.js, antes da última linha, adicione:
 
-function createAuthToken() {
-    const tokenData = {
-        userId: 'ErikSlava',
-        timestamp: Date.now(),
-        exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // Expira em 24 horas
-    };
-    
-    const token = btoa(JSON.stringify(tokenData));
-    localStorage.setItem('diario_auth', token);
-    return token;
+function showSystemStatus() {
+    console.log('=== STATUS DO SISTEMA ===');
+    console.log('Usuário:', CONFIG.USERNAME);
+    console.log('Senha configurada:', CONFIG.PASSWORD ? 'Sim' : 'Não');
+    console.log('Webhook:', CONFIG.WEBHOOK_URL.substring(0, 30) + '...');
+    console.log('IP do usuário:', state.userIP);
+    console.log('Token salvo:', localStorage.getItem('diario_auth') ? 'Sim' : 'Não');
+    console.log('====================');
 }
 
-// Modifique a função startTransition para criar o token:
-function startTransition() {
-    console.log('🚀 Iniciando transição...');
-    
-    // Criar token de autenticação
+// Função de teste para verificar autenticação
+window.testAuth = function() {
+    console.log('=== TESTE DE AUTENTICAÇÃO ===');
+    console.log('1. Criando token...');
     createAuthToken();
     
-    let timeLeft = CONFIG.TRANSITION_TIME;
-    let progress = 0;
+    console.log('2. Verificando localStorage...');
+    console.log('diario_auth:', localStorage.getItem('diario_auth'));
+    console.log('diario_login_time:', localStorage.getItem('diario_login_time'));
     
-    const updateTransition = () => {
-        // Atualizar contador
-        if (elements.countdownTimer) {
-            elements.countdownTimer.textContent = timeLeft;
+    console.log('3. Testando decodificação...');
+    try {
+        const token = localStorage.getItem('diario_auth');
+        if (token) {
+            const decoded = atob(token);
+            console.log('Token decodificado:', decoded);
+            const data = JSON.parse(decoded);
+            console.log('Dados do token:', data);
         }
-        
-        // Atualizar barra de progresso
-        progress = 100 - ((timeLeft / CONFIG.TRANSITION_TIME) * 100);
-        if (elements.progressFill) {
-            elements.progressFill.style.width = `${progress}%`;
-        }
-        if (elements.progressPercent) {
-            elements.progressPercent.textContent = `${Math.round(progress)}%`;
-        }
-        
-        timeLeft--;
-        
-        if (timeLeft < 0) {
-            // Redirecionar para o diário
-            window.location.href = 'diario.html';
-        } else {
-            setTimeout(updateTransition, 1000);
-        }
-    };
+    } catch (error) {
+        console.error('Erro:', error);
+    }
     
-    updateTransition();
-}
+    console.log('=== FIM DO TESTE ===');
+};
+
+// Adicionar botão de teste manual
+document.addEventListener('DOMContentLoaded', function() {
+    // Botão de teste manual (apenas para desenvolvimento)
+    const testBtn = document.createElement('button');
+    testBtn.textContent = '🔧 Testar Auth';
+    testBtn.style.cssText = `
+        position: fixed;
+        bottom: 60px;
+        left: 10px;
+        background: #00a8ff;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 9998;
+        font-size: 12px;
+        opacity: 0.3;
+        transition: opacity 0.3s;
+    `;
+    
+    testBtn.onmouseenter = () => testBtn.style.opacity = '1';
+    testBtn.onmouseleave = () => testBtn.style.opacity = '0.3';
+    testBtn.onclick = window.testAuth;
+    
+    document.body.appendChild(testBtn);
+});
+
+// ⬇⬇⬇ ESTA PARTE DEVE SER A ÚLTIMA DO ARQUIVO ⬇⬇⬇
 // Inicializar quando a página carregar
 window.addEventListener('load', function() {
     console.log('📖 Sistema do Diário Pessoal carregado!');
     console.log('👤 Usuário configurado:', CONFIG.USERNAME);
-    console.log('🔗 Webhook:', CONFIG.WEBHOOK_URL.substring(0, 50) + '...');
+    console.log('🔗 Webhook:', CONFIG.WEBHOOK_URL.substring(0, 30) + '...');
+    
+    // Adicionar atalhos de teclado para debug
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+Shift+D para debug
+        if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+            e.preventDefault();
+            window.testAuth();
+        }
+        
+        // Ctrl+Shift+L para simular login
+        if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+            e.preventDefault();
+            console.log('🔧 Simulando login...');
+            if (elements.usernameInput) elements.usernameInput.value = CONFIG.USERNAME;
+            if (elements.passwordInput) elements.passwordInput.value = CONFIG.PASSWORD;
+            handleLogin();
+        }
+    });
 });
