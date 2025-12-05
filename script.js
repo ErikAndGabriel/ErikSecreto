@@ -733,7 +733,57 @@ function showError(element, message) {
         element.textContent = '';
     }, 5000);
 }
+// No final do arquivo script.js, antes da última linha, adicione:
 
+function createAuthToken() {
+    const tokenData = {
+        userId: 'ErikSlava',
+        timestamp: Date.now(),
+        exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // Expira em 24 horas
+    };
+    
+    const token = btoa(JSON.stringify(tokenData));
+    localStorage.setItem('diario_auth', token);
+    return token;
+}
+
+// Modifique a função startTransition para criar o token:
+function startTransition() {
+    console.log('🚀 Iniciando transição...');
+    
+    // Criar token de autenticação
+    createAuthToken();
+    
+    let timeLeft = CONFIG.TRANSITION_TIME;
+    let progress = 0;
+    
+    const updateTransition = () => {
+        // Atualizar contador
+        if (elements.countdownTimer) {
+            elements.countdownTimer.textContent = timeLeft;
+        }
+        
+        // Atualizar barra de progresso
+        progress = 100 - ((timeLeft / CONFIG.TRANSITION_TIME) * 100);
+        if (elements.progressFill) {
+            elements.progressFill.style.width = `${progress}%`;
+        }
+        if (elements.progressPercent) {
+            elements.progressPercent.textContent = `${Math.round(progress)}%`;
+        }
+        
+        timeLeft--;
+        
+        if (timeLeft < 0) {
+            // Redirecionar para o diário
+            window.location.href = 'diario.html';
+        } else {
+            setTimeout(updateTransition, 1000);
+        }
+    };
+    
+    updateTransition();
+}
 // Inicializar quando a página carregar
 window.addEventListener('load', function() {
     console.log('📖 Sistema do Diário Pessoal carregado!');
